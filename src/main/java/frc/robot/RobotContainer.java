@@ -31,11 +31,12 @@ public class RobotContainer
 {
 
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                                                                         "swerve/neo"));
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(SwerveConfig.DRIVE_CONFIGURATION, SwerveConfig.CONTROLLER_CONFIGURATION);
   // CommandJoystick rotationController = new CommandJoystick(1);
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  CommandJoystick driverController = new CommandJoystick(1);
+  private final CommandJoystick left_controller = new CommandJoystick(0);
+  private final CommandJoystick right_controller = new CommandJoystick(1);
+  private final CommandXboxController operatorController = new CommandXboxController(2);
 
   // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
   XboxController driverXbox = new XboxController(0);
@@ -75,11 +76,11 @@ public class RobotContainer
                                                     () -> driverXbox.getRawAxis(2), () -> true, false, true);
     TeleopDrive closedFieldRel = new TeleopDrive(
         drivebase,
-        () -> MathUtil.applyDeadband(driverController.getY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverController.getX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> -driverController.getRawAxis(3), () -> true, false, true);
+        () -> MathUtil.applyDeadband(left_controller.getY(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(left_controller.getX(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> right_controller.getX(), () -> true, false, false);
 
-    drivebase.setDefaultCommand(!RobotBase.isSimulation() ? closedAbsoluteDrive : closedFieldAbsoluteDrive);
+    drivebase.setDefaultCommand(closedFieldRel /*!RobotBase.isSimulation() ? /*closedAbsoluteDrive: closedFieldAbsoluteDrive*/);
   }
 
   /**
